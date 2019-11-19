@@ -1,5 +1,6 @@
 const Twitter = require('twitter')
 const express = require('express')
+const path = require('path')
 const queryString = require('query-string')
 require('dotenv').config()
 const Database = require('./db')
@@ -40,7 +41,8 @@ const query = async (term, max_id = null) => {
   }
 }
 
-app.get('/', (req, res) => res.send('Hello World!!'))
+// app.get('/', (req, res) => res.send('Hello World!!'))
+app.use(express.static(path.join(__dirname, 'client/build')))
 
 app.get('/api/query/recent', async (req, res) => {
   const term = req.query.term
@@ -71,6 +73,10 @@ app.get('/api/query/recent', async (req, res) => {
   }
   res.header("Access-Control-Allow-Origin", "*")
   res.send(tres)
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/client/build/index.html'))
 })
 
 app.listen(port, async () => {
