@@ -6,7 +6,7 @@ require('dotenv').config()
 const Database = require('./db')
 
 const app = express()
-const port = 3002
+const port = process.env.PORT || 3000
 let db
 const client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -50,7 +50,6 @@ app.get('/api/query/recent', async (req, res) => {
   since.setDate(since.getDate() - 7)
   since.setHours(0, 0, 0, 0)
   if (req.query.since) {
-    console.log(req.query.since)
     since = new Date(req.query.since)
   }
   const iter = Math.min(parseInt(req.query.iter || '7'), 7)

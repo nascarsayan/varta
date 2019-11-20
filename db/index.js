@@ -28,7 +28,6 @@ class Database {
 
   async getTweets({ term, since }) {
     let start = since
-    console.log(start)
     const tweets = await this.db.collection('twstream').find({
       date: { $gte: start },
       term: { $regex: term, $options: 'i' }
