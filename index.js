@@ -46,11 +46,17 @@ app.use(express.static(path.join(__dirname, 'client/build')))
 
 app.get('/api/query/recent', async (req, res) => {
   const term = req.query.term
-  const past = parseInt(req.query.past || '7')
+  let since = new Date()
+  since.setDate(since.getDate() - 7)
+  since.setHours(0, 0, 0, 0)
+  if (req.query.since) {
+    console.log(req.query.since)
+    since = new Date(req.query.since)
+  }
   const iter = Math.min(parseInt(req.query.iter || '7'), 7)
   let tres = []
   try {
-    const { tweets, cached } = await db.getTweets({ term, past })
+    const { tweets, cached } = await db.getTweets({ term, since })
     if (cached) {
       tres = tweets
     } else {

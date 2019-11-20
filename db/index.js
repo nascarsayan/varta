@@ -26,12 +26,11 @@ class Database {
     }))
   }
 
-  async getTweets({ term, past }) {
-    let start = new Date()
-    start.setHours(0, 0, 0, 0)
-    start.setDate(start.getDate() - past)
+  async getTweets({ term, since }) {
+    let start = since
+    console.log(start)
     const tweets = await this.db.collection('twstream').find({
-      created_on: { $gte: start },
+      date: { $gte: start },
       term: { $regex: term, $options: 'i' }
     }).toArray()
     const cached = await this.isCached({ term })
