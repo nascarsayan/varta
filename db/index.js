@@ -1,7 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
 class Database {
 
-  constructor(uri, dbname) {
+  constructor(fullpath) {
+    let compo = fullpath.split('/')
+    let uri = compo.slice(0, compo.length - 1).join('/'), dbname = compo[compo.length - 1]
     this.uri = uri
     this.dbname = dbname
     this.db = {}

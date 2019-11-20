@@ -59,7 +59,7 @@ app.get('/api/query/recent', async (req, res) => {
     if (cached) {
       tres = tweets
     } else {
-      console.log('Fetching from twitter')
+      // console.log('Fetching from twitter')
       let max_id = null, ires
       tres = []
       for (let i = 0; i < iter; i++) {
@@ -71,7 +71,7 @@ app.get('/api/query/recent', async (req, res) => {
         if (!max_id) break
       }
       await db.addTweets(tres)
-      console.log(`Fetched ${tres.length} queries of ${term}`)
+      // console.log(`Fetched ${tres.length} queries of ${term}`)
     }
   } catch (err) {
     console.log(err)
@@ -86,7 +86,7 @@ app.get('*', (req, res) => {
 
 app.listen(port, async () => {
   try {
-    db = new Database(process.env.MONGO_URI || 'mongodb://localhost:27017', process.env.MONGO_DBNAME || 'twitter')
+    db = new Database(process.env.MONGODB_URI || 'mongodb://localhost:27017/twitter')
     await db.connect()
   } catch (err) {
     console.log(err)
