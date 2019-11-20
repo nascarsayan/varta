@@ -7,7 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "author": "nascarsayan@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/tweery/server.git"
+  },
+  "author": {
+    "name": "Sayan Naskar",
+    "email": "nascarsayan@gmail.com"
+  },
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
