@@ -8,29 +8,20 @@ const Database = require('./db')
 const app = express()
 const port = process.env.PORT || 3000
 let db
-const env2 = {
-  TWITTER_CONSUMER_KEY: 'tgDwhsUArYx3xjS27jHnehjtL',
-  TWITTER_CONSUMER_SECRET: 'dQbCzhL7JNPLRLGckUomrPOZhdZ8CIbFu2yN7GLBvElT0AxOqE',
-  TWITTER_ACCESS_TOKEN_KEY: '700641895098109952-HX1iddf8ogk6x001JrAAYJXHOY1gGfY',
-  TWITTER_ACCESS_TOKEN_SECRET: 'L6v5GPs2dHPiLtiaRXwtWl6OnZfmuPlVWz1zR9epwhLqk',
-  MONGODB_URI: 'mongodb://localhost:27017/twitter',
-  MONGO_DBNAME: 'twitter',
-  PROXY='false'
-}
 const client = new Twitter({
-  consumer_key: env2.TWITTER_CONSUMER_KEY,
-  consumer_secret: env2.TWITTER_CONSUMER_SECRET,
-  access_token_key: env2.TWITTER_ACCESS_TOKEN_KEY,
-  access_token_secret: env2.TWITTER_ACCESS_TOKEN_SECRET,
+  consumer_key: process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 })
 
-if (env2.PROXY === 'true') {
+if (process.env.PROXY === 'true') {
   client.request_options = { proxy: 'http://172.16.2.30:8080' }
 }
 
 let range = n => Array.from(Array(n).keys())
 
-const query = async (term, max_id = null) => {
+const queryTweets = async (term, max_id = null) => {
   try {
     let qobj = { q: `place:b850c1bfd38f30e0 ${term}`, count: 100, include_entities: 1 }
     if (max_id) {
@@ -72,7 +63,7 @@ app.get('/api/query/recent', async (req, res) => {
       let max_id = null, ires
       tres = []
       for (let i = 0; i < iter; i++) {
-        ires = await query(term, max_id)
+        ires = await queryTweets(term, max_id)
         if (Object.keys(ires) === 0) break
         tres = [...tres, ...ires.statuses]
         // console.log(ires.search_metadata)

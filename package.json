@@ -18,12 +18,16 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "bootstrap": "^4.4.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jquery": "^3.4.1",
     "moment": "^2.24.0",
     "mongodb": "^3.3.4",
+    "newsapi": "^2.4.0",
     "query-string": "^6.9.0",
+    "react-js-pagination": "^3.0.3",
     "twitter": "^1.7.1"
   },
   "heroku-postbuild": "cd client && npm install && npm run build"
