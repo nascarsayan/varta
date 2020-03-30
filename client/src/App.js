@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { grommet } from "grommet/themes"
 import { Download, Schedule, Search, Article, Twitter } from 'grommet-icons'
-import { Grommet, TextInput, Box, Button, Text, DropButton, Select, Anchor } from 'grommet'
+import { Grommet, TextInput, Box, Button, Text, DropButton, Anchor } from 'grommet'
 import fileDownload from 'js-file-download'
 import { ClipLoader } from 'react-spinners'
 
@@ -13,7 +13,7 @@ class App extends Component {
   state = {
     points: [],
     suggestions: [],
-    term: '',
+    term: { 0: '', 1: '' },
     open: false,
     date: '',
     time: '12:00 am',
@@ -97,6 +97,18 @@ class App extends Component {
     return local.toJSON().slice(0, 10)
   }
 
+  getModeIcon = () => {
+    const {
+      state: {
+        modeIdx,
+        modes
+      }
+    } = this
+    const mode = modes[modeIdx]
+    if (mode === 'tweets') return <Twitter />
+    if (mode === 'news') return <Article />
+  }
+
   onDownload = async () => {
     const {
       state: {
@@ -115,7 +127,7 @@ class App extends Component {
     } else if (mode === 'news') {
       data = news
     }
-    fileDownload(JSON.stringify(data, null, 2), `${mode}-${term}-${curdate}.json`)
+    fileDownload(JSON.stringify(data, null, 2), `${mode}-${term[modeIdx]}-${curdate}.json`)
   }
 
   render() {
@@ -131,13 +143,13 @@ class App extends Component {
         modes,
         modeIdx,
         news,
-        newsPageSize
+        newsPageSize,
       },
+      getModeIcon,
       onTwitterSearch,
       onNewsSearch,
       onNewsPageChange,
       onDownload,
-      onModeChange
     } = this
     const onClose = (nextDate, nextTime) => {
       this.setState({ date: nextDate, time: nextTime, open: false })
@@ -149,6 +161,7 @@ class App extends Component {
     } else if (modes[modeIdx] === 'news' && news) {
       dataSize = news.articles.length
     }
+    const nextModeIdx = (modeIdx + 1) % modes.length
     return (
       <Grommet full theme={grommet}>
         {(loading) ? (
@@ -175,7 +188,7 @@ class App extends Component {
               >
                 <Text size="xsmall">
                   Developed by
-                  <Anchor label=" Sayan Naskar (5th Year, Department of CSE, IIT Kharagpur)," href="https://www.linkedin.com/in/nascarsayan" target="_blank" />
+                  <Anchor label=" Sayan Naskar (Department of CSE, IIT Kharagpur)," href="https://www.linkedin.com/in/nascarsayan" target="_blank" />
                   <Anchor label=" Saptarshi Ghosh (Department of CSE, IIT Kharagpur)," href="http://cse.iitkgp.ac.in/~saptarshi" target="_blank" />
                   <Anchor label=" Arnab Jana (Centre for Urban Science and Engineering, IIT Bombay)" href="http://cuse.iitb.ac.in/people/faculty/arnab-jana" target="_blank" />
                 </Text>
@@ -191,70 +204,76 @@ class App extends Component {
                   pad={{ vertical: '3px', horizontal: '1rem' }}
                   direction="row"
                   border={{ size: 'small', color: '#ededed' }}>
-                  <Box
+                  {/* <Box
                     align="center"
                     pad={{ right: 'small' }}
                     justify="center"
                     direction="row"
                     width="small"
                   >
-                    {/* <Text textAlign="center">
-                      Search For
-                    </Text> */}
                     <Select
                       options={modes}
                       value={modes[modeIdx]}
                       onChange={({ option }) => onModeChange(option)}
                     />
-                  </Box>
+                  </Box> */}
+                  <Button icon={getModeIcon()} />
                   <Box width="small">
                     <TextInput
                       placeholder='Term'
-                      value={term}
-                      onChange={e => this.setState({ term: e.target.value })}
+                      value={term[modeIdx]}
+                      onChange={e => this.setState({ term: { ...term, [modeIdx]: e.target.value } })}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           if (modes[modeIdx] === 'tweets')
-                            onTwitterSearch(suggestions, term, date, time)
+                            onTwitterSearch(suggestions, term[modeIdx], date, time)
                           else if (modes[modeIdx] === 'news')
-                            onNewsSearch(term, date, time)
+                            onNewsSearch(term[modeIdx], date, time)
                         }
                       }}
                     />
                   </Box>
-                  <Box align="center" pad={{ left: 'small' }}>
-                    <Text textAlign="center">
-                      since
-                    </Text>
-                  </Box>
-                  <Box>
-                    <DropButton
-                      open={open}
-                      onClose={() => this.setState({ open: false })}
-                      onOpen={() => this.setState({ open: true })}
-                      dropContent={
-                        <DropContent date={date} time={time} onClose={onClose} />
-                      }
-                    >
-                      <Box direction="row" gap="medium" align="center" pad="small">
-                        <Text color={date ? undefined : "dark-5"}>
-                          {date
-                            ? `${new Date(date).toLocaleDateString()} ${time}`
-                            : "Select date & time"}
-                        </Text>
-                        <Schedule />
-                      </Box>
-                    </DropButton>
-                  </Box>
+                  {
+                    (modes[modeIdx] === 'tweets')
+                      ?
+                      <React.Fragment>
+                        <Box align="center" pad={{ left: 'small' }}>
+                          <Text textAlign="center">
+                            since
+                          </Text>
+                        </Box>
+                        <Box>
+                          <DropButton
+                            open={open}
+                            onClose={() => this.setState({ open: false })}
+                            onOpen={() => this.setState({ open: true })}
+                            dropContent={
+                              <DropContent date={date} time={time} onClose={onClose} />
+                            }
+                          >
+                            <Box direction="row" gap="medium" align="center" pad="small">
+                              <Text color={date ? undefined : "dark-5"}>
+                                {date
+                                  ? `${new Date(date).toLocaleDateString()} ${time}`
+                                  : "Select date & time"}
+                              </Text>
+                              <Schedule />
+                            </Box>
+                          </DropButton>
+                        </Box>
+                      </React.Fragment>
+                      :
+                      null
+                  }
                   <Box overflow="hidden" background="accent-1" round="full">
                     <Button
                       icon={<Search />}
                       color='accent-1'
                       onClick={e => {
                         if (modes[modeIdx] === 'tweets')
-                          onTwitterSearch(suggestions, term, date, time)
+                          onTwitterSearch(suggestions, term[modeIdx], date, time)
                         else if (modes[modeIdx] === 'news')
-                          onNewsSearch(term, date, time)
+                          onNewsSearch(term[modeIdx], date, time)
                       }}
                     />
                   </Box>
@@ -266,6 +285,13 @@ class App extends Component {
                     color={'#C6C6C6'}
                     onClick={_ => onDownload()}
                     disabled={dataSize === 0}
+                  />
+                </Box>
+                <Box margin={{ left: '1rem' }}>
+                  <Button
+                    theme={{ button: { border: { radius: '0px' } } }}
+                    label={`Go to ${modes[nextModeIdx]}${modes[nextModeIdx] === 'news' ? ' articles' : ''}`}
+                    onClick={() => this.setState({ modeIdx: nextModeIdx })}
                   />
                 </Box>
               </Box>
