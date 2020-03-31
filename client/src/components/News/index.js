@@ -57,12 +57,19 @@ class News extends Component {
                   {article.description}
                 </Text>
               </Box>
-              <Box>
-                <Anchor
-                  label={'Read More'}
-                  href={article.url}
-                  target="_blank"
-                />
+              <Box justify="between" direction="row">
+                <Box>
+                  <Anchor
+                    label={'Read More'}
+                    href={article.url}
+                    target="_blank"
+                  />
+                </Box>
+                <Box>
+                  <Text color='neutral-2'>
+                    {new Date(article.publishedAt).toString().replace('GMT+0530 (India Standard Time)', 'IST')}
+                  </Text>
+                </Box>
               </Box>
             </Box>
           ))}
