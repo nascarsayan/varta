@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { grommet } from "grommet/themes"
 import { Download, Schedule, Search, Article, Twitter } from 'grommet-icons'
-import { Grommet, TextInput, Box, Button, Text, DropButton, Anchor } from 'grommet'
+import { Grommet, TextInput, Box, Button, Text, DropButton, Anchor, RadioButtonGroup } from 'grommet'
 import fileDownload from 'js-file-download'
 import { ClipLoader } from 'react-spinners'
 
@@ -21,6 +21,8 @@ class App extends Component {
     modes: ['tweets', 'news'],
     modeIcons: [Twitter, Article],
     modeIdx: 0,
+    newsSource: "India",
+    newsSource2Api: { "India": '/top-headlines?country=in&', "World": '/everything?' },
     // news: { ...news, url: 'dummy.com', page: 1, totalResults: 100 },
     news: null,
     x: 'tweery02@itiomail.com',
@@ -43,26 +45,38 @@ class App extends Component {
   onTwitterSearch = async (suggestions, term, date, time) => {
     this.setState({ loading: true })
     const url = `/api/query/recent?term=${term}${date ? `&since=${new Date(`${new Date(date).toLocaleDateString()} ${time}`).toISOString()}` : ''}`
-    const resRaw = await fetch(url)
-    const data = await resRaw.json()
-    this.setState({ points: data, loading: false, suggestions: [...suggestions, term] })
+    try {
+      const resRaw = await fetch(url)
+      const data = await resRaw.json()
+      this.setState({ points: data, loading: false, suggestions: [...suggestions, term] })
+    } catch {
+      this.setState({ loading: false })
+    }
   }
 
   onNewsSearch = async (term, date, time) => {
     let {
       state: {
         mapApiKeys,
-        mapApiIndex
+        mapApiIndex,
+        newsSource2Api,
+        newsSource,
       }
     } = this
     const apiKey = mapApiKeys[mapApiIndex]
-    const url = `https://newsapi.org/v2/everything?q=${term}${date ? `&from=${new Date(`${new Date(date).toLocaleDateString()} ${time}`).toISOString()}` : ''}&apiKey=${apiKey}`
+    const url = `https://newsapi.org/v2${newsSource2Api[newsSource]}q=${term}${date ? `&from=${new Date(`${new Date(date).toLocaleDateString()} ${time}`).toISOString()}` : ''}&apiKey=${apiKey}`
     this.setState({ loading: true })
-    const resRaw = await fetch(url)
-    let data = await resRaw.json()
-    data = { ...data, url, page: 1, totalResults: Math.min(data.totalResults, 100) }
-    mapApiIndex = (mapApiIndex + 1) % mapApiKeys.length
-    this.setState({ news: data, loading: false, mapApiIndex })
+    try {
+      const resRaw = await fetch(url)
+      let data = await resRaw.json()
+      if (data.articles) {
+        data = { ...data, url, page: 1, totalResults: Math.min(data.totalResults, 100) }
+        mapApiIndex = (mapApiIndex + 1) % mapApiKeys.length
+        this.setState({ news: data, loading: false, mapApiIndex })
+      }
+    } finally {
+      this.setState({ loading: false })
+    }
   }
 
   onNewsPageChange = async (page) => {
@@ -144,6 +158,7 @@ class App extends Component {
         modeIdx,
         news,
         newsPageSize,
+        newsSource,
       },
       getModeIcon,
       onTwitterSearch,
@@ -204,23 +219,10 @@ class App extends Component {
                   pad={{ vertical: '3px', horizontal: '1rem' }}
                   direction="row"
                   border={{ size: 'small', color: '#ededed' }}>
-                  {/* <Box
-                    align="center"
-                    pad={{ right: 'small' }}
-                    justify="center"
-                    direction="row"
-                    width="small"
-                  >
-                    <Select
-                      options={modes}
-                      value={modes[modeIdx]}
-                      onChange={({ option }) => onModeChange(option)}
-                    />
-                  </Box> */}
                   <Button icon={getModeIcon()} />
                   <Box width="small">
                     <TextInput
-                      placeholder='Term'
+                      placeholder='Type Query'
                       value={term[modeIdx]}
                       onChange={e => this.setState({ term: { ...term, [modeIdx]: e.target.value } })}
                       onKeyDown={e => {
@@ -263,7 +265,16 @@ class App extends Component {
                         </Box>
                       </React.Fragment>
                       :
-                      null
+                      <Box
+                        pad={{ left: 'small', right: 'small' }}
+                      >
+                        <RadioButtonGroup
+                          name="news-source"
+                          options={['India', 'World']}
+                          value={newsSource}
+                          onChange={(e) => this.setState({ newsSource: e.target.value })}
+                        />
+                      </Box>
                   }
                   <Box overflow="hidden" background="accent-1" round="full">
                     <Button
