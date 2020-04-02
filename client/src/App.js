@@ -198,14 +198,14 @@ class App extends Component {
                 flex={false}
                 gap="medium"
                 justify="between"
-                pad="small"
-                height="0.5rem"
+                pad={{ left: '0.5rem' }}
               >
                 <Text size="xsmall">
                   Developed by
                   <Anchor label=" Sayan Naskar (Department of CSE, IIT Kharagpur)," href="https://www.linkedin.com/in/nascarsayan" target="_blank" />
                   <Anchor label=" Saptarshi Ghosh (Department of CSE, IIT Kharagpur)," href="http://cse.iitkgp.ac.in/~saptarshi" target="_blank" />
-                  <Anchor label=" Arnab Jana (Centre for Urban Science and Engineering, IIT Bombay)" href="http://cuse.iitb.ac.in/people/faculty/arnab-jana" target="_blank" />
+                  <Anchor label=" Arnab Jana (Centre for Urban Science and Engineering, IIT Bombay) " href="http://cuse.iitb.ac.in/people/faculty/arnab-jana" target="_blank" />
+                  as part of the project titled <b>Building Healthcare Informatics Systems Utilising Web Data</b> sponsored by  DST, GoI (under ICPS-EDA scheme)
                 </Text>
               </Box>
               <Box
