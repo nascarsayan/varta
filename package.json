@@ -23,7 +23,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jquery": "^3.4.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mongodb": "^3.3.4",
     "newsapi": "^2.4.0",
     "query-string": "^6.9.0",
